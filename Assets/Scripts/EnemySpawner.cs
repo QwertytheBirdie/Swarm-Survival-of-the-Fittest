@@ -41,7 +41,7 @@ public class EnemySpawner : MonoBehaviour
 
         // Scale up difficulty (faster enemies)
         float extraSpeed = elapsedTime * enemySpeedIncrease;
-        enemy.GetComponent<Enemy>().speed += extraSpeed;
+        enemy.GetComponent<Enemy>().Speed+= extraSpeed;
     }
 
     Vector3 GetRandomOffscreenPosition()

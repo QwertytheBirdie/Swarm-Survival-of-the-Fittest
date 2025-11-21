@@ -7,9 +7,21 @@ public class PlayerController : MonoBehaviour
     public float bulletSpeed = 10f;
     public float shootCooldown = 1f;
 
+    public Transform firePoint; // Where the bullets will spawn
+
+
     private float shootTimer = 0f;
     private Camera cam;
     private Rigidbody2D rb;
+
+    public int killCount = 0;
+    public float survivalTime = 0f;
+
+    public TMPro.TextMeshProUGUI killCountText;
+    public TMPro.TextMeshProUGUI timerText;
+
+    private bool isGameOver = false;
+
 
     void Start()
     {
@@ -22,6 +34,18 @@ public class PlayerController : MonoBehaviour
         Move();
         Aim();
         Shoot();
+
+        if (bulletPrefab == null)
+            Debug.LogError("bulletPrefab is null!");
+
+        if (firePoint == null)
+            Debug.LogError("firePoint is null!");
+
+
+        if (isGameOver) return;
+        survivalTime += Time.deltaTime;
+        timerText.text = "Time: " + survivalTime.ToString("F1");
+
     }
     void Aim()
     {
@@ -61,5 +85,20 @@ public class PlayerController : MonoBehaviour
         pos = Camera.main.ViewportToWorldPoint(viewPos);
         transform.position = pos;
     }
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            GameManager.instance.GameOver();
+            Destroy(gameObject);
+        }
+    }
+
+    public void AddKill()
+    {
+        killCount++;
+        killCountText.text = "Kills: " + killCount;
+    }
+
 
 }

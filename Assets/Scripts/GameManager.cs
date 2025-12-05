@@ -1,100 +1,87 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro; // Needed for TextMeshPro
+using UnityEngine.UI;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance;
-
-    [Header("Score & Timer")]
-    public int killCount = 0;
-    public float survivalTime = 0f;
+    [Header("UI")]
+    public GameObject gameOverPanel;
     public TextMeshProUGUI killCountText;
     public TextMeshProUGUI timerText;
 
-    [Header("Game Over UI")]
-    public GameObject gameOverUI;
-
-    private bool isGameOver = false;
+    [Header("Gameplay")]
+    public bool isGameOver = false;
+    private float survivalTime = 0f;
+    private int kills = 0;
+    
+    public static GameManager instance;
 
     void Awake()
     {
-        // Singleton pattern
         if (instance == null)
-        {
             instance = this;
-        }
         else
-        {
             Destroy(gameObject);
-        }
     }
-
     void Start()
     {
-        // Hide Game Over panel at the start
-        if (gameOverUI != null)
-            gameOverUI.SetActive(false);
+        // Hide Game Over panel at start
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
 
-        // Initialize UI
-        UpdateKillUI();
-        UpdateTimerUI();
+        // Reset stats
+        survivalTime = 0f;
+        kills = 0;
+
+        UpdateUI();
     }
 
     void Update()
     {
-        if (isGameOver) return;
-
-        // Update survival timer
-        survivalTime += Time.deltaTime;
-        UpdateTimerUI();
+        if (!isGameOver)
+        {
+            survivalTime += Time.deltaTime;
+            UpdateUI();
+        }
     }
 
-    // Call this when an enemy dies
     public void AddKill()
     {
-        killCount++;
-        if (killCountText != null)
-            killCountText.text = "Kills: " + killCount;
+        kills++;
+        UpdateUI();
     }
 
-
-    private void UpdateKillUI()
+    void UpdateUI()
     {
         if (killCountText != null)
-            killCountText.text = "Kills: " + killCount;
-    }
+            killCountText.text = "Kills: " + kills;
 
-    private void UpdateTimerUI()
-    {
         if (timerText != null)
-            timerText.text = "Time: " + survivalTime.ToString("F1") + "s";
+            timerText.text = "Time: " + survivalTime.ToString("F1");
     }
 
-    // Call this when the player dies
     public void GameOver()
     {
+        if (isGameOver) return;
+
         isGameOver = true;
 
-        // Show Game Over UI
-        if (gameOverUI != null)
-            gameOverUI.SetActive(true);
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
 
-        // Stop the game
         Time.timeScale = 0f;
     }
 
-    // Button callback to restart the current scene
     public void RestartGame()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    // Button callback to return to Main Menu
-    public void ReturnToMenu()
+    public void MainMenu()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu"); // Make sure this matches your main menu scene name
+        SceneManager.LoadScene(0); // Make sure your main menu is Scene 0
     }
 }

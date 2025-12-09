@@ -3,25 +3,30 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    // Called when the Start button is pressed
-    public void PlayGame()
+    // Called when the Endless Survival button is clicked
+    public void PlayEndlessSurvival()
     {
-        // Loads the next scene in Build Settings
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        Debug.Log("Endless Survival button clicked!");
+        // Make sure this matches your scene name exactly
+        SceneManager.LoadScene("EndlessSurvival");
     }
 
-    // Optional version (if you want to load by scene name instead)
-    public void PlayGameByName(string sceneName)
+    // Called when the 2 Player Battle button is clicked
+    public void PlayTwoPlayerBattle()
     {
-        SceneManager.LoadScene(sceneName);
+        Debug.Log("2 Player Battle button clicked!");
+        // Make sure this matches your scene name exactly
+        SceneManager.LoadScene("TwoPlayerBattle");
     }
 
-    // Called when the Quit button is pressed
+    // Called when the Quit button is clicked
     public void QuitGame()
     {
-        Debug.Log("Quit button pressed!");
-
-        // Works only in a built game (EXE, APP)
-        Application.Quit();
+        Debug.Log("Quit Game button clicked!");
+        Application.Quit(); // Will close the build
+#if UNITY_EDITOR
+        // Stops play mode in the Editor
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 }

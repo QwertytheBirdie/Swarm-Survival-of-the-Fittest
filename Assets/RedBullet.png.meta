@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: fd8a2f701307ee249b17fb7d802e5c30
+guid: 30dcc2bb8595b6b469a830eba7cfc32a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4810702507026764722
-    second: New Piskel (7)_0
+      213: -6665356834582444394
+    second: New Piskel (9)_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: New Piskel (7)_0
+      name: RedBullet
       rect:
         serializedVersion: 2
-        x: 7
-        y: 6
+        x: 8
+        y: 8
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 2b35963217c03c240800000000000000
-      internalID: 4810702507026764722
+      spriteID: 696cd750645ef73a0800000000000000
+      internalID: -6665356834582444394
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 64ac64ed5018c9044b314f9e224fdc09
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      New Piskel (7)_0: 4810702507026764722
+      RedBullet: -6665356834582444394
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

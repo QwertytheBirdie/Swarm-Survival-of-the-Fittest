@@ -1,39 +1,65 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class Enemy : MonoBehaviour
 {
-    public float speed = 2f;
-    private Transform player;
+    public float moveSpeed = 2f;
 
-    private void Start()
+    private Rigidbody2D rb;
+    private Transform targetPlayer;
+
+    void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    private void Update()
+    void Update()
     {
-        if (player == null) return;
-
-        Vector3 dir = (player.position - transform.position).normalized;
-        transform.position += dir * speed * Time.deltaTime;
+        FindClosestPlayer();
     }
 
-    public void Die()
+    void FixedUpdate()
     {
-        // Award kill
-        if (GameManager.instance != null)
-            GameManager.instance.AddKill();
+        if (targetPlayer == null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
 
-        Destroy(gameObject);
+        Vector2 dir = ((Vector2)targetPlayer.position - rb.position).normalized;
+        rb.linearVelocity = dir * moveSpeed;
+    }
+
+    void FindClosestPlayer()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        float closestDist = Mathf.Infinity;
+        Transform closest = null;
+
+        foreach (GameObject p in players)
+        {
+            if (!p.activeInHierarchy) continue;
+
+            float d = Vector2.SqrMagnitude(p.transform.position - transform.position);
+            if (d < closestDist)
+            {
+                closestDist = d;
+                closest = p.transform;
+            }
+        }
+
+        targetPlayer = closest;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // If player touches enemy → game over
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.collider.CompareTag("Player"))
         {
-            GameManager.instance.GameOver();
+            PlayerHealth ph = collision.collider.GetComponent<PlayerHealth>();
+            if (ph != null)
+            {
+                ph.TakeDamage(1);
+            }
         }
     }
 }

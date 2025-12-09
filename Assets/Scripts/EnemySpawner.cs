@@ -2,65 +2,173 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemySpawner : MonoBehaviour
+public class EnemySpawner_Endless : MonoBehaviour
 {
+    [Header("Enemy Prefab")]
     public GameObject enemyPrefab;
 
     [Header("Spawn Points")]
-    public Transform[] spawnPoints;   // Assign your 16 spawn points here
+    public Transform[] spawnPoints;
 
     [Header("Pattern Settings")]
-    public float spawnDelay = 1.5f;   // Time between spawns
-    private int patternIndex = 0;     // Which pattern we are on
-    private int spawnIndex = 0;       // Which value inside a pattern we are currently using
+    public float timeBetweenPatternSteps = 0.75f;  // delay between steps inside a pattern
+    public float timeBetweenPatterns = 3f;         // delay between patterns
+    public float enemyBaseSpeed = 2f;              // starting speed
+    public float enemySpeedIncreasePerPattern = 0.25f;
 
-    // Create your patterns (each number corresponds to an index in the spawnPoints array)
-    private List<int[]> patterns = new List<int[]>();
+    private int currentPatternIndex = 0;
+    private float enemySpeedMultiplier = 1f;
+
+    // ------------------------------
+    // 10 PATTERNS (CUSTOMIZABLE)
+    // ------------------------------
+    private List<List<int[]>> patterns = new List<List<int[]>>();
 
     void Start()
     {
-        // EXAMPLE patterns â€” customize how you like
-        patterns.Add(new int[] { 0, 8, 11, 15 });
-        patterns.Add(new int[] { 3, 7, 12, 1, 8, 14 });
-        patterns.Add(new int[] { 2, 4, 6, 9, 11, 13 });
-        patterns.Add(new int[] { 15, 14, 13, 12, 11, 10, 9 });
-        patterns.Add(new int[] { 1, 10, 6, 7, 9, 4, 13, 10, 11, 3 });
-        patterns.Add(new int[] { 2, 5, 1, 0, 11, 4, 7, 3, 2, 0 });
-        patterns.Add(new int[] { 15, 6, 10, 0, 13, 3, 9, 12, 0, 8 });
-        patterns.Add(new int[] { 1, 9, 2, 0, 4, 9, 7, 10, 2, 0 });
-
-        StartCoroutine(SpawnEnemies());
+        BuildPatterns();
+        StartCoroutine(RunPatterns());
     }
 
-    IEnumerator SpawnEnemies()
+    void BuildPatterns()
+    {
+        patterns = new List<List<int[]>>
+        {
+            // PATTERN 1 — simple single spawns
+            new List<int[]>
+            {
+                new int[] {1},
+                new int[] {4},
+                new int[] {7},
+                new int[] {2}
+            },
+
+            // PATTERN 2 — 2-at-once spawns
+            new List<int[]>
+            {
+                new int[] {1, 10},
+                new int[] {3, 7},
+                new int[] {2, 5},
+                new int[] {8, 12}
+            },
+
+            // PATTERN 3 — mixed single + double
+            new List<int[]>
+            {
+                new int[] {4},
+                new int[] {2, 9},
+                new int[] {5},
+                new int[] {1, 3}
+            },
+
+            // PATTERN 4 — many small single spawns
+            new List<int[]>
+            {
+                new int[] {7},
+                new int[] {14},
+                new int[] {0},
+                new int[] {9},
+                new int[] {3}
+            },
+
+            // PATTERN 5 — heavy double bursts
+            new List<int[]>
+            {
+                new int[] {6, 10},
+                new int[] {2, 8},
+                new int[] {4, 11},
+                new int[] {1, 15}
+            },
+
+            // PATTERN 6 — triple spawns (intense)
+            new List<int[]>
+            {
+                new int[] {1, 5, 9},
+                new int[] {3, 7, 12},
+            },
+
+            // PATTERN 7 — alternating 1 then 2
+            new List<int[]>
+            {
+                new int[] {4},
+                new int[] {6, 10},
+                new int[] {3},
+                new int[] {2, 7},
+                new int[] {8}
+            },
+
+            // PATTERN 8 — widespread pressure
+            new List<int[]>
+            {
+                new int[] {0, 7},
+                new int[] {4},
+                new int[] {2, 9},
+                new int[] {13},
+            },
+
+            // PATTERN 9 — panic swarm
+            new List<int[]>
+            {
+                new int[] {1, 4},
+                new int[] {7, 10},
+                new int[] {12, 15},
+                new int[] {0, 3}
+            },
+
+            // PATTERN 10 — boss-like build-up then burst
+            new List<int[]>
+            {
+                new int[] {2},
+                new int[] {5},
+                new int[] {9},
+                new int[] {12},
+                new int[] {1, 3, 7}    // TRIPLE BURST
+            },
+        };
+    }
+
+    IEnumerator RunPatterns()
     {
         while (true)
         {
-            // Get which spawn point to use
-            int spawnPointID = patterns[patternIndex][spawnIndex];
-            Transform point = spawnPoints[spawnPointID];
+            List<int[]> pattern = patterns[currentPatternIndex];
 
-            // Spawn enemy
-            Instantiate(enemyPrefab, point.position, Quaternion.identity);
-
-            // Move to next spawn point in the pattern
-            spawnIndex++;
-
-            // If we finished current pattern â†’ go to the next one
-            if (spawnIndex >= patterns[patternIndex].Length)
+            foreach (int[] spawnGroup in pattern)
             {
-                spawnIndex = 0;
-                patternIndex++;
-
-                // If we reached last pattern â†’ loop back to start
-                if (patternIndex >= patterns.Count)
-                    patternIndex = 0;
+                SpawnGroup(spawnGroup);
+                yield return new WaitForSeconds(timeBetweenPatternSteps);
             }
 
-            // Difficulty increases slowly over time
-            spawnDelay = Mathf.Max(0.35f, spawnDelay - 0.01f);
+            // difficulty increases every pattern
+            enemySpeedMultiplier += enemySpeedIncreasePerPattern;
 
-            yield return new WaitForSeconds(spawnDelay);
+            // next pattern
+            currentPatternIndex++;
+            if (currentPatternIndex >= patterns.Count)
+                currentPatternIndex = 0; // loop forever
+
+            yield return new WaitForSeconds(timeBetweenPatterns);
+        }
+    }
+
+    void SpawnGroup(int[] spawns)
+    {
+        foreach (int i in spawns)
+        {
+            if (i < 0 || i >= spawnPoints.Length)
+            {
+                Debug.LogWarning("Spawn index out of range: " + i);
+                continue;
+            }
+
+            GameObject enemy = Instantiate(enemyPrefab, spawnPoints[i].position, Quaternion.identity);
+
+            // Apply difficulty scaling
+            Enemy e = enemy.GetComponent<Enemy>();
+            if (e != null)
+            {
+                e.moveSpeed = enemyBaseSpeed + enemySpeedMultiplier;
+            }
         }
     }
 }

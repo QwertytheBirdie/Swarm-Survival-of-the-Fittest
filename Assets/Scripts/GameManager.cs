@@ -1,87 +1,109 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    [Header("UI")]
+    public static GameManager Instance;   // GLOBAL ACCESS
+
+    [Header("Gameplay State")]
+    public bool isGameOver = false;
+
+    [Header("UI References")]
     public GameObject gameOverPanel;
     public TextMeshProUGUI killCountText;
     public TextMeshProUGUI timerText;
 
-    [Header("Gameplay")]
-    public bool isGameOver = false;
-    private float survivalTime = 0f;
-    private int kills = 0;
-    
-    public static GameManager instance;
+    [Header("Gameplay Stats")]
+    public int killCount = 0;
+    public float survivalTime = 0f;
 
-    void Awake()
+    private void Awake()
     {
-        if (instance == null)
-            instance = this;
-        else
-            Destroy(gameObject);
+        // Make this a globally accessible singleton
+        Instance = this;
     }
-    void Start()
+
+    private void Start()
     {
-        // Hide Game Over panel at start
+        // Be sure Game Over screen is hidden at start
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
 
-        // Reset stats
-        survivalTime = 0f;
-        kills = 0;
-
-        UpdateUI();
+        UpdateKillUI();
+        UpdateTimerUI();
     }
 
-    void Update()
+    private void Update()
     {
         if (!isGameOver)
         {
             survivalTime += Time.deltaTime;
-            UpdateUI();
+            UpdateTimerUI();
         }
     }
 
+    // -----------------------------
+    //       KILL COUNT SYSTEM
+    // -----------------------------
     public void AddKill()
     {
-        kills++;
-        UpdateUI();
+        killCount++;
+        UpdateKillUI();
     }
 
-    void UpdateUI()
+    private void UpdateKillUI()
     {
         if (killCountText != null)
-            killCountText.text = "Kills: " + kills;
+            killCountText.text = "Kills: " + killCount;
+    }
 
+    // -----------------------------
+    //       TIMER UI SYSTEM
+    // -----------------------------
+    private void UpdateTimerUI()
+    {
         if (timerText != null)
             timerText.text = "Time: " + survivalTime.ToString("F1");
     }
 
+    // -----------------------------
+    //        GAME OVER LOGIC
+    // -----------------------------
     public void GameOver()
     {
         if (isGameOver) return;
 
         isGameOver = true;
 
+        Time.timeScale = 0f; // freeze gameplay
+
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
-
-        Time.timeScale = 0f;
     }
 
+    // -----------------------------
+    //      BUTTON FUNCTIONS
+    // -----------------------------
     public void RestartGame()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex
+        );
     }
 
-    public void MainMenu()
+    public void GoToMainMenu()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(0); // Make sure your main menu is Scene 0
+        UnityEngine.SceneManagement.SceneManager.LoadScene(0); // Main Menu should be scene 0
     }
+
+    // -----------------------------
+    //     DIFFICULTY MULTIPLIER
+    // -----------------------------
+    public float GetDifficultyMultiplier()
+    {
+        return 1f + (survivalTime / 30f);
+    }
+
 }

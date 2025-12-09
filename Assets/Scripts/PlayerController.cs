@@ -2,103 +2,77 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Movement")]
     public float moveSpeed = 5f;
-    public GameObject bulletPrefab;
-    public float bulletSpeed = 10f;
-    public float shootCooldown = 1f;
-
-    public Transform firePoint; // Where the bullets will spawn
-
-
-    private float shootTimer = 0f;
-    private Camera cam;
     private Rigidbody2D rb;
+    private Vector2 movement;
 
-    public int killCount = 0;
-    public float survivalTime = 0f;
+    [Header("Shooting")]
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+    public float fireRate = 0.5f;
+    private float nextFireTime = 0f;
 
-    public TMPro.TextMeshProUGUI killCountText;
-    public TMPro.TextMeshProUGUI timerText;
-
-    private bool isGameOver = false;
-
+    [Header("References")]
+    public Camera cam;
+    private Vector2 mousePosition;
 
     void Start()
     {
-        cam = Camera.main;
         rb = GetComponent<Rigidbody2D>();
+
+        if (cam == null)
+            cam = Camera.main;
+
+        if (firePoint == null)
+            Debug.LogError("FirePoint not assigned!");
+        if (bulletPrefab == null)
+            Debug.LogError("BulletPrefab not assigned!");
     }
 
     void Update()
     {
-        Move();
-        Aim();
-        Shoot();
+        // ---- Movement input ----
+        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
 
-        if (bulletPrefab == null)
-            Debug.LogError("bulletPrefab is null!");
+        // ---- Mouse position ----
+        mousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
 
-        if (firePoint == null)
-            Debug.LogError("firePoint is null!");
-
-
-        if (isGameOver) return;
-        survivalTime += Time.deltaTime;
-        timerText.text = "Time: " + survivalTime.ToString("F1");
-
+        // ---- Shooting (click only) ----
+        if (Input.GetMouseButtonDown(0) && Time.time >= nextFireTime)
+        {
+            Shoot();
+            nextFireTime = Time.time + fireRate;
+        }
     }
-    void Aim()
+
+    void FixedUpdate()
     {
-        Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 lookDir = mousePos - transform.position;
+        // ---- Move player ----
+        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+
+        // ---- Rotate player toward cursor ----
+        Vector2 lookDir = mousePosition - rb.position;
         float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
-        rb.rotation = angle; // rotate player to face cursor
+
+        // No offset needed because sprite faces RIGHT
+        rb.rotation = angle;
     }
 
     void Shoot()
     {
-        shootTimer -= Time.deltaTime;
-
-        if (Input.GetMouseButtonDown(0) && shootTimer <= 0f)
+        if (bulletPrefab != null && firePoint != null)
         {
-            shootTimer = shootCooldown;
-            Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-            Vector2 shootDir = (mousePos - transform.position).normalized;
-
-            GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
-            Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-            bulletRb.linearVelocity = shootDir * bulletSpeed;
-        }
-    }
-    void Move()
-    {
-        float moveX = Input.GetAxisRaw("Horizontal");
-        float moveY = Input.GetAxisRaw("Vertical");
-        Vector2 moveDir = new Vector2(moveX, moveY).normalized;
-        rb.linearVelocity = moveDir * moveSpeed;
-
-        // Clamp the player to stay on screen
-        Vector3 pos = transform.position;
-        Vector3 viewPos = Camera.main.WorldToViewportPoint(pos);
-        viewPos.x = Mathf.Clamp01(viewPos.x);
-        viewPos.y = Mathf.Clamp01(viewPos.y);
-        pos = Camera.main.ViewportToWorldPoint(viewPos);
-        transform.position = pos;
-    }
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Enemy"))
-        {
-            GameManager.instance.GameOver();
-            Destroy(gameObject);
+            Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         }
     }
 
-    public void AddKill()
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        killCount++;
-        killCountText.text = "Kills: " + killCount;
+        if (collision.collider.CompareTag("Enemy"))
+        {
+            GameManager.Instance.GameOver();
+        }
     }
-
-
 }

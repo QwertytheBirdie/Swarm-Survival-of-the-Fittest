@@ -2,20 +2,18 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public int maxHealth = 3;
+    public int maxHealth = 1;
     private int currentHealth;
-    public bool isDead = false;
 
     void Start()
     {
         currentHealth = maxHealth;
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(int damage)
     {
-        if (isDead) return;
+        currentHealth -= damage;
 
-        currentHealth -= amount;
         if (currentHealth <= 0)
         {
             Die();
@@ -24,10 +22,13 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
-        isDead = true;
-        Debug.Log(gameObject.name + " died.");
-        // For Endless Survival, trigger game over here
-        // For 2P Battle you might just disable the player
+        // Tell GameManager the player died
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.PlayerDied();
+        }
+
+        // Disable the player object so it disappears / stops moving
         gameObject.SetActive(false);
     }
 }

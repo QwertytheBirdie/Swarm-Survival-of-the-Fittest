@@ -1,26 +1,30 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
-using UnityEngine.SceneManagement;
 
 public class TwoPlayerGameManager : MonoBehaviour
 {
     public static TwoPlayerGameManager Instance;
 
+    [Header("Match Settings")]
+    public float matchDuration = 180f; // 3 minutes
+    private float timer;
+
+    [Header("Player Status")]
+    public bool player1Alive = true;
+    public bool player2Alive = true;
+
     [Header("Score Tracking")]
-    public int p1Kills = 0;
-    public int p2Kills = 0;
+    public int player1Kills = 0;
+    public int player2Kills = 0;
 
-    [Header("Timer")]
-    public float matchDuration = 180f;
-    private float timeRemaining;
+    [Header("UI References")]
+    public TMP_Text timerText;
+    public TMP_Text player1KillsText;
+    public TMP_Text player2KillsText;
+    public GameObject winnerPanel;
+    public TMP_Text winnerText;
+
     private bool matchEnded = false;
-
-    [Header("UI")]
-    public TextMeshProUGUI p1KillsText;
-    public TextMeshProUGUI p2KillsText;
-    public TextMeshProUGUI timerText;
-    public GameObject resultPanel;
-    public TextMeshProUGUI resultText;
 
     void Awake()
     {
@@ -29,73 +33,135 @@ public class TwoPlayerGameManager : MonoBehaviour
 
     void Start()
     {
-        timeRemaining = matchDuration;
+        timer = matchDuration;
 
-        if (resultPanel != null)
-            resultPanel.SetActive(false);
+        // Hide winner UI at start
+        if (winnerPanel != null)
+            winnerPanel.SetActive(false);
 
-        UpdateUI();
+        UpdateKillUI();
+        UpdateTimerUI();
     }
 
     void Update()
     {
         if (matchEnded) return;
 
-        timeRemaining -= Time.deltaTime;
-        if (timeRemaining <= 0)
+        // Countdown timer
+        timer -= Time.deltaTime;
+
+        UpdateTimerUI();
+
+        if (timer <= 0f)
         {
-            timeRemaining = 0;
-            EndMatch();
+            EndBattle();
         }
 
-        UpdateUI();
+        // If both players dead early → end immediately
+        if (!player1Alive && !player2Alive)
+        {
+            EndBattle();
+        }
     }
 
+    // -------------------------------------
+    // ADDING KILLS
+    // -------------------------------------
     public void AddKill(int shooterID)
     {
-        if (shooterID == 1) p1Kills++;
-        if (shooterID == 2) p2Kills++;
+        if (shooterID == 1)
+            player1Kills++;
+        else if (shooterID == 2)
+            player2Kills++;
 
-        UpdateUI();
+        UpdateKillUI();
     }
 
-    void UpdateUI()
+    // -------------------------------------
+    // PLAYER DEATH HANDLING
+    // -------------------------------------
+    public void OnPlayerDied(int index)
     {
-        if (p1KillsText != null)
-            p1KillsText.text = p1Kills.ToString();
+        if (index == 1) player1Alive = false;
+        if (index == 2) player2Alive = false;
 
-        if (p2KillsText != null)
-            p2KillsText.text = p2Kills.ToString();
-
-        if (timerText != null)
-            timerText.text = Mathf.CeilToInt(timeRemaining).ToString();
+        // If both players die → end the match
+        if (!player1Alive && !player2Alive)
+        {
+            EndBattle();
+        }
     }
 
-    void EndMatch()
+    // -------------------------------------
+    // ENDING THE MATCH
+    // -------------------------------------
+    public void EndBattle()
     {
+        if (matchEnded) return;
+
         matchEnded = true;
 
-        if (resultPanel != null)
-            resultPanel.SetActive(true);
+        // Stop all enemy spawners if you have them
+        EnemySpawner_Battle[] spawners = FindObjectsOfType<EnemySpawner_Battle>();
+        foreach (var s in spawners)
+        {
+            s.StopSpawning();
+        }
 
-        string winner;
+        // Determine winner
+        int winner = 0;
 
-        if (p1Kills > p2Kills) winner = "Player 1 Wins!";
-        else if (p2Kills > p1Kills) winner = "Player 2 Wins!";
-        else winner = "It's a Tie!";
+        if (player1Kills > player2Kills)
+            winner = 1;
+        else if (player2Kills > player1Kills)
+            winner = 2;
+        else
+            winner = 0; // tie
 
-        if (resultText != null)
-            resultText.text = winner;
+        // Activate win screen
+        if (winnerPanel != null)
+            winnerPanel.SetActive(true);
+
+        if (winnerText != null)
+        {
+            if (winner == 1)
+                winnerText.text = "Player 1 Wins!";
+            else if (winner == 2)
+                winnerText.text = "Player 2 Wins!";
+            else
+                winnerText.text = "Draw!";
+        }
+
+        Debug.Log("Battle Ended. Winner: " + winner);
     }
 
-    public void RestartMatch()
+    // -------------------------------------
+    // UI UPDATES
+    // -------------------------------------
+    void UpdateKillUI()
     {
-        Scene current = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(current.name);
+        if (player1KillsText != null)
+            player1KillsText.text = "P1 Kills: " + player1Kills;
+
+        if (player2KillsText != null)
+            player2KillsText.text = "P2 Kills: " + player2Kills;
     }
 
+    void UpdateTimerUI()
+    {
+        if (timerText != null)
+        {
+            int minutes = Mathf.FloorToInt(timer / 60f);
+            int seconds = Mathf.FloorToInt(timer % 60f);
+            timerText.text = minutes.ToString("00") + ":" + seconds.ToString("00");
+        }
+    }
+
+    // -------------------------------------
+    // CALLED BY UI BUTTON (OPTIONAL)
+    // -------------------------------------
     public void ReturnToMainMenu()
     {
-        SceneManager.LoadScene("MainMenu");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
     }
 }

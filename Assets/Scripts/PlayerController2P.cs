@@ -4,11 +4,11 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController2P : MonoBehaviour
 {
-    [Header("Movement")]
+    [Header("Movement Settings")]
     public float moveSpeed = 5f;
     private Vector2 moveInput;
 
-    [Header("Aiming")]
+    [Header("Aiming Settings")]
     public Transform firePoint;
     private Vector2 aimInput;
 
@@ -17,29 +17,32 @@ public class PlayerController2P : MonoBehaviour
 
     private Rigidbody2D rb;
 
-    void Awake()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        // Move
-        Vector2 velocity = moveInput * moveSpeed;
-        rb.linearVelocity = velocity;
+        // -------- MOVEMENT --------
+        rb.linearVelocity = moveInput * moveSpeed;
 
-        // Aim / rotate
+        // -------- AIMING --------
         if (aimInput.sqrMagnitude > 0.1f)
         {
             float angle = Mathf.Atan2(aimInput.y, aimInput.x) * Mathf.Rad2Deg;
             Quaternion rot = Quaternion.Euler(0, 0, angle);
+
             transform.rotation = rot;
+
             if (firePoint != null)
                 firePoint.rotation = rot;
         }
     }
 
-    // --------- Input System callbacks (wired in PlayerInput) ----------
+    // ==============================================================
+    // INPUT SYSTEM CALLBACKS — THESE MUST EXIST EXACTLY LIKE THIS
+    // ==============================================================
 
     public void OnMove(InputAction.CallbackContext ctx)
     {

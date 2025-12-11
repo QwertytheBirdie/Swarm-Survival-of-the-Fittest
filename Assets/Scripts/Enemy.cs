@@ -1,35 +1,40 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
 public class Enemy : MonoBehaviour
 {
     public float moveSpeed = 2f;
-
-    private Rigidbody2D rb;
     private Transform targetPlayer;
-
-    void Awake()
-    {
-        rb = GetComponent<Rigidbody2D>();
-    }
 
     void Update()
     {
         FindClosestPlayer();
+        MoveTowardPlayer();
     }
 
-    void FixedUpdate()
+    // ---------------------------------------------------------
+    // Move toward the closest player
+    // ---------------------------------------------------------
+    void MoveTowardPlayer()
     {
-        if (targetPlayer == null)
-        {
-            rb.linearVelocity = Vector2.zero;
-            return;
-        }
+        if (targetPlayer == null) return;
 
-        Vector2 dir = ((Vector2)targetPlayer.position - rb.position).normalized;
-        rb.linearVelocity = dir * moveSpeed;
+        // Move
+        Vector2 newPos = Vector2.MoveTowards(
+            transform.position,
+            targetPlayer.position,
+            moveSpeed * Time.deltaTime
+        );
+        transform.position = newPos;
+
+        // Rotate to face the player
+        Vector2 dir = targetPlayer.position - transform.position;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
+    // ---------------------------------------------------------
+    // Find the closest player object tagged "Player"
+    // ---------------------------------------------------------
     void FindClosestPlayer()
     {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -51,14 +56,18 @@ public class Enemy : MonoBehaviour
         targetPlayer = closest;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    // ---------------------------------------------------------
+    // Kill the player on physical collision
+    // Requires BOTH colliders to NOT be triggers
+    // ---------------------------------------------------------
+    private void OnCollisionEnter2D(Collision2D col)
     {
-        if (collision.collider.CompareTag("Player"))
+        if (col.collider.CompareTag("Player"))
         {
-            PlayerHealth ph = collision.collider.GetComponent<PlayerHealth>();
+            PlayerHealth ph = col.collider.GetComponent<PlayerHealth>();
             if (ph != null)
             {
-                ph.TakeDamage(1);
+                ph.TakeDamage(9999); // Instant death
             }
         }
     }

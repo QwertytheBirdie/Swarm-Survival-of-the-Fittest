@@ -31,6 +31,9 @@ public class GameManager : MonoBehaviour
 
         UpdateKillUI();
         UpdateTimerUI();
+
+        // Ensure game is running at normal speed
+        Time.timeScale = 1f;
     }
 
     private void Update()
@@ -79,6 +82,15 @@ public class GameManager : MonoBehaviour
 
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
+
+        Debug.Log("GAME OVER triggered by GameManager.");
+    }
+
+    // 🔹 NEW: called by PlayerHealth when HP reaches 0
+    public void PlayerDied()
+    {
+        // For now, just reuse your existing GameOver flow
+        GameOver();
     }
 
     // -----------------------------
@@ -105,5 +117,4 @@ public class GameManager : MonoBehaviour
     {
         return 1f + (survivalTime / 30f);
     }
-
 }

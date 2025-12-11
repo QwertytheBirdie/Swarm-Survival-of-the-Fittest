@@ -17,6 +17,9 @@ public class EnemySpawner_Battle : MonoBehaviour
     private float nextSpawnTime;
     private float nextDifficultyTime;
 
+    // NEW — allows TwoPlayerGameManager to stop the spawner
+    private bool spawningEnabled = true;
+
     void Start()
     {
         currentSpawnRate = initialSpawnRate;
@@ -26,6 +29,8 @@ public class EnemySpawner_Battle : MonoBehaviour
 
     void Update()
     {
+        if (!spawningEnabled) return;    // NEW: stops everything immediately
+
         if (Time.time >= nextSpawnTime)
         {
             SpawnEnemy();
@@ -41,11 +46,18 @@ public class EnemySpawner_Battle : MonoBehaviour
 
     void SpawnEnemy()
     {
+        if (!spawningEnabled) return;   // Prevent spawns mid-frame
         if (spawnPoints.Length == 0 || enemyPrefab == null) return;
 
         int idx = Random.Range(0, spawnPoints.Length);
         Transform sp = spawnPoints[idx];
 
         Instantiate(enemyPrefab, sp.position, Quaternion.identity);
+    }
+
+    // NEW — This is required by TwoPlayerGameManager
+    public void StopSpawning()
+    {
+        spawningEnabled = false;
     }
 }

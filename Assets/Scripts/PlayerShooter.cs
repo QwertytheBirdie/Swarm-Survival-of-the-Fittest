@@ -14,6 +14,15 @@ public class PlayerShooter : MonoBehaviour
 
     private float nextFireTime = 0f;
 
+    [Header("Audio")]
+    public AudioClip shootSound;     // assign in inspector
+    private AudioSource audioSource;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
     public void TryShoot()
     {
         if (Time.time < nextFireTime) return;
@@ -21,12 +30,19 @@ public class PlayerShooter : MonoBehaviour
 
         nextFireTime = Time.time + fireRate;
 
+        // Spawn bullet
         GameObject b = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
 
         Bullet bullet = b.GetComponent<Bullet>();
         if (bullet != null)
         {
             bullet.shooterID = playerIndex;
+        }
+
+        // Play shooting sound (does not break battle mode)
+        if (shootSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(shootSound);
         }
     }
 }

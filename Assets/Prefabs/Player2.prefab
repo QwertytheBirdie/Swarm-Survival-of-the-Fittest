@@ -15,8 +15,8 @@ GameObject:
   - component: {fileID: 4530370820930144368}
   - component: {fileID: -4231857729194259885}
   - component: {fileID: 7564012479173005082}
-  - component: {fileID: -7978919131665879674}
   - component: {fileID: 2402185865342150076}
+  - component: {fileID: 3188595066892251198}
   m_Layer: 0
   m_Name: Player2
   m_TagString: Player
@@ -107,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9283b970dceec9a4e8c244b80d01f761, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerIndex: 2
+  playerIndex: 1
   bulletPrefab: {fileID: 2895006181525455227, guid: a2020a023c571c94da5804cc72445686, type: 3}
   firePoint: {fileID: 703686037638087018}
   fireRate: 0.25
@@ -124,6 +124,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 3
+  isDead: 0
 --- !u!95 &4530370820930144368
 Animator:
   serializedVersion: 7
@@ -158,7 +159,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: 89f6b0fde4df9254684bd23b1d495493, type: 3}
+  m_Actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_NotificationBehavior: 2
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
@@ -172,44 +173,96 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents:
   - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: be2d0b83-17e5-44dd-b87b-05a5d6290be3
-    m_ActionName: 'Player1/Move[/XInputControllerWindows/leftStick,/SwitchProControllerHID/leftStick]'
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 1d33e24b-da70-4dbc-bdd1-16986c49622e
-    m_ActionName: 'Player1/Aim[/XInputControllerWindows/rightStick,/SwitchProControllerHID/rightStick]'
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 9ceb2c45-b0de-46cd-a2d7-9aa0372ab55f
-    m_ActionName: 'Player1/Fire[/XInputControllerWindows/rightTrigger,/SwitchProControllerHID/rightTrigger]'
-  - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11500000, guid: 6d071ae7fc30062409aaed165d28a349, type: 3}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
+      - m_Target: {fileID: 3188595066892251198}
+        m_TargetAssemblyTypeName: PlayerController2P, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_ActionId: acc6cff5-8b44-48ae-ac73-c6390b470033
-    m_ActionName: 'Player2/Move[/XInputControllerWindows/leftStick,/SwitchProControllerHID/leftStick]'
+    m_ActionId: 77e409bb-0ef1-458b-9676-169b791de1c4
+    m_ActionName: 'Player/Move[/XInputControllerWindows/leftStick]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3188595066892251198}
+        m_TargetAssemblyTypeName: PlayerController2P, Assembly-CSharp
+        m_MethodName: OnAim
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 33d92b9d-c491-452a-8ce0-3623bfa344e3
+    m_ActionName: 'Player/Aim[/XInputControllerWindows/rightStick]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3188595066892251198}
+        m_TargetAssemblyTypeName: PlayerController2P, Assembly-CSharp
+        m_MethodName: OnFire
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 35f5d408-eb37-4c72-a3e9-21182ced82c7
+    m_ActionName: 'Player/Fire[/XInputControllerWindows/rightTrigger]'
   - m_PersistentCalls:
       m_Calls: []
-    m_ActionId: f7c06c59-6c57-4685-8ca1-92133c82f477
-    m_ActionName: 'Player2/Aim[/XInputControllerWindows/rightStick,/SwitchProControllerHID/rightStick]'
+    m_ActionId: c95b2375-e6d9-4b88-9c4c-c5e76515df4b
+    m_ActionName: 'UI/Navigate[/XInputControllerWindows/leftStick/up,/XInputControllerWindows/rightStick/up,/XInputControllerWindows/leftStick/down,/XInputControllerWindows/rightStick/down,/XInputControllerWindows/leftStick/left,/XInputControllerWindows/rightStick/left,/XInputControllerWindows/leftStick/right,/XInputControllerWindows/rightStick/right,/XInputControllerWindows/dpad,/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]'
   - m_PersistentCalls:
       m_Calls: []
-    m_ActionId: 624b4fd1-fefa-4ffa-8ef2-ddf274696b95
-    m_ActionName: 'Player2/Fire[/XInputControllerWindows/rightTrigger,/SwitchProControllerHID/rightTrigger]'
+    m_ActionId: 7607c7b6-cd76-4816-beef-bd0341cfe950
+    m_ActionName: 'UI/Submit[/Keyboard/enter,/XInputControllerWindows/buttonSouth]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 15cef263-9014-4fd5-94d9-4e4a6234a6ef
+    m_ActionName: 'UI/Cancel[/Keyboard/escape,/XInputControllerWindows/buttonEast]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 32b35790-4ed0-4e9a-aa41-69ac6d629449
+    m_ActionName: 'UI/Point[/Mouse/position]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 3c7022bf-7922-4f7c-a998-c437916075ad
+    m_ActionName: 'UI/Click[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 44b200b1-1557-4083-816c-b22cbdf77ddf
+    m_ActionName: 'UI/RightClick[/Mouse/rightButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: dad70c86-b58c-4b17-88ad-f5e53adf419e
+    m_ActionName: 'UI/MiddleClick[/Mouse/middleButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 0489e84a-4833-4c40-bfae-cea84b696689
+    m_ActionName: 'UI/ScrollWheel[/Mouse/scroll]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 24908448-c609-4bc3-a128-ea258674378a
+    m_ActionName: UI/TrackedDevicePosition
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be
+    m_ActionName: UI/TrackedDeviceOrientation
   m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: GamepadScheme
-  m_DefaultActionMap: Player2
+  m_DefaultControlScheme: Gamepad
+  m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!50 &7564012479173005082
@@ -239,21 +292,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &-7978919131665879674
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5196788223500937839}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d071ae7fc30062409aaed165d28a349, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 5
-  firePoint: {fileID: 703686037638087018}
-  shooter: {fileID: 3921285004199478373}
 --- !u!58 &2402185865342150076
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -290,6 +328,21 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: -0.0008251667, y: -0.017650127}
   m_Radius: 1.009511
+--- !u!114 &3188595066892251198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5196788223500937839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d071ae7fc30062409aaed165d28a349, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 5
+  firePoint: {fileID: 703686037638087018}
+  shooter: {fileID: 3921285004199478373}
 --- !u!1 &6704681099967005614
 GameObject:
   m_ObjectHideFlags: 0

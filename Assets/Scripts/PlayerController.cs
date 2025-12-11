@@ -1,78 +1,58 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveSpeed = 5f;
-    private Rigidbody2D rb;
-    private Vector2 movement;
+    public float moveSpeed = 10f;
+    private Vector2 moveInput;
+
+    [Header("Aiming")]
+    public Transform firePoint;
+    private Vector2 aimInput;
 
     [Header("Shooting")]
-    public GameObject bulletPrefab;
-    public Transform firePoint;
-    public float fireRate = 0.5f;
-    private float nextFireTime = 0f;
+    public PlayerShooter shooter;
 
-    [Header("References")]
-    public Camera cam;
-    private Vector2 mousePosition;
+    private Rigidbody2D rb;
 
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-
-        if (cam == null)
-            cam = Camera.main;
-
-        if (firePoint == null)
-            Debug.LogError("FirePoint not assigned!");
-        if (bulletPrefab == null)
-            Debug.LogError("BulletPrefab not assigned!");
-    }
-
-    void Update()
-    {
-        // ---- Movement input ----
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
-
-        // ---- Mouse position ----
-        mousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
-
-        // ---- Shooting (click only) ----
-        if (Input.GetMouseButtonDown(0) && Time.time >= nextFireTime)
-        {
-            Shoot();
-            nextFireTime = Time.time + fireRate;
-        }
     }
 
     void FixedUpdate()
     {
-        // ---- Move player ----
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+        // Movement using left stick
+        rb.linearVelocity = moveInput * moveSpeed;
 
-        // ---- Rotate player toward cursor ----
-        Vector2 lookDir = mousePosition - rb.position;
-        float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
-
-        // No offset needed because sprite faces RIGHT
-        rb.rotation = angle;
-    }
-
-    void Shoot()
-    {
-        if (bulletPrefab != null && firePoint != null)
+        // Aiming using right stick
+        if (aimInput.sqrMagnitude > 0.1f)
         {
-            Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+            float angle = Mathf.Atan2(aimInput.y, aimInput.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle);
+
+            if (firePoint != null)
+                firePoint.rotation = Quaternion.Euler(0, 0, angle);
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    // ---------- INPUT SYSTEM CALLBACKS ----------
+
+    public void OnMove(InputAction.CallbackContext ctx)
     {
-        if (collision.collider.CompareTag("Enemy"))
-        {
-            GameManager.Instance.GameOver();
-        }
+        moveInput = ctx.ReadValue<Vector2>();
+    }
+
+    public void OnAim(InputAction.CallbackContext ctx)
+    {
+        aimInput = ctx.ReadValue<Vector2>();
+    }
+
+    public void OnFire(InputAction.CallbackContext ctx)
+    {
+        if (ctx.performed && shooter != null)
+            shooter.TryShoot();
     }
 }

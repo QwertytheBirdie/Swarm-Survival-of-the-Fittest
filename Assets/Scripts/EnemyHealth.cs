@@ -10,7 +10,7 @@ public class EnemyHealth : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    public void TakeDamage(int damage, int shooterID)
+    public void TakeDamage(int damage, int shooterID = 0)
     {
         currentHealth -= damage;
 
@@ -22,8 +22,14 @@ public class EnemyHealth : MonoBehaviour
 
     void Die(int shooterID)
     {
-        // Two Player Battle mode: Add kill to GameManager
-        if (TwoPlayerGameManager.Instance != null)
+        // Endless Survival
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.AddKill();
+        }
+
+        // Two Player Battle
+        if (TwoPlayerGameManager.Instance != null && shooterID > 0)
         {
             TwoPlayerGameManager.Instance.AddKill(shooterID);
         }
@@ -31,3 +37,4 @@ public class EnemyHealth : MonoBehaviour
         Destroy(gameObject);
     }
 }
+

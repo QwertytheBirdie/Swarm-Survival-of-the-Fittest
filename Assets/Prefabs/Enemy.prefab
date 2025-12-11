@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 3910745946576418962}
   - component: {fileID: 8323039131493287181}
   - component: {fileID: 2714585419026355972}
-  m_Layer: 0
+  - component: {fileID: -8182806955485294570}
+  m_Layer: 13
   m_Name: Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -103,8 +104,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_LinearDamping: 5
+  m_AngularDamping: 5
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -113,10 +114,10 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
+  m_CollisionDetection: 1
+  m_Constraints: 4
 --- !u!114 &8323039131493287181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -129,8 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faa16d7dfdb023b42ba9fd089831dc52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2
-  health: 1
+  moveSpeed: 2
 --- !u!60 &2714585419026355972
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -188,3 +188,16 @@ PolygonCollider2D:
       - {x: 1.0135819, y: -0.48125553}
       - {x: 1.0135819, y: 0.06874447}
   m_UseDelaunayMesh: 0
+--- !u!114 &-8182806955485294570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8058807415297080831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2389f7ba9583464599a6dc31c7b24a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 1

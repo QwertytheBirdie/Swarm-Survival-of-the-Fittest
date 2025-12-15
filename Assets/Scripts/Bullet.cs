@@ -1,52 +1,74 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Collider2D))]
 public class Bullet : MonoBehaviour
 {
+    [Header("Bullet Settings")]
     public float speed = 10f;
     public int damage = 1;
     public float lifetime = 3f;
 
-    public int shooterID = 0;  // 0 = enemy, 1 = Player1, 2 = Player2
+    [Header("Ownership")]
+    // 0 = Enemy bullet
+    // 1 = Player 1 bullet
+    // 2 = Player 2 bullet
+    public int shooterID = 0;
 
     private void Start()
     {
+        // Ensure bullet dies even if it never hits anything
         Destroy(gameObject, lifetime);
     }
 
     private void Update()
     {
+        // Move forward in local X direction
         transform.Translate(Vector2.right * speed * Time.deltaTime);
     }
 
     private void OnTriggerEnter2D(Collider2D col)
     {
-        // Hit enemy
+        // -------------------------------------------------
+        // HIT ENEMY (players can kill enemies)
+        // -------------------------------------------------
         if (col.CompareTag("Enemy"))
         {
-            EnemyHealth eh = col.GetComponent<EnemyHealth>();
-            if (eh != null)
-                eh.TakeDamage(damage, shooterID);
+            EnemyHealth enemyHealth = col.GetComponent<EnemyHealth>();
+            if (enemyHealth != null)
+            {
+                enemyHealth.TakeDamage(damage, shooterID);
+            }
 
             Destroy(gameObject);
             return;
         }
 
-        // Hit player
+        // -------------------------------------------------
+        // HIT PLAYER (ONLY enemy bullets can hurt players)
+        // -------------------------------------------------
         if (col.CompareTag("Player"))
         {
-            PlayerHealth ph = col.GetComponent<PlayerHealth>();
-            if (ph != null)
-                ph.TakeDamage(damage);
+            // Block player bullets from hurting any player
+            if (shooterID != 0)
+                return;
+
+            PlayerHealth playerHealth = col.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(damage);
+            }
 
             Destroy(gameObject);
             return;
         }
 
-        // Hit wall
+        // -------------------------------------------------
+        // HIT WALL / ENVIRONMENT
+        // -------------------------------------------------
         if (col.CompareTag("Wall"))
         {
             Destroy(gameObject);
+            return;
         }
     }
 }
-

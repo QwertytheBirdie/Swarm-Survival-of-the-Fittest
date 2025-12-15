@@ -117,4 +117,5 @@ public class GameManager : MonoBehaviour
     {
         return 1f + (survivalTime / 30f);
     }
+
 }

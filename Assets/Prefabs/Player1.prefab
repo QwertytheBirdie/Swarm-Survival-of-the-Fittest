@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 3364234868394315400}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5, y: -0.035, z: 0}
+  m_LocalPosition: {x: 1.51, y: -0.035, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -257,6 +257,9 @@ MonoBehaviour:
   moveSpeed: 5
   firePoint: {fileID: 204213966828725774}
   shooter: {fileID: 6502545579470479727}
+  spriteRenderer: {fileID: 5259646712960257096}
+  player1Color: {r: 0, g: 0, b: 1, a: 1}
+  player2Color: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &5361691147793452701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -370,6 +373,18 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be
     m_ActionName: UI/TrackedDeviceOrientation
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c801d157-f3f3-40a8-9d1e-d1e2a86acbaa
+    m_ActionName: 'SinglePlayer/Move[/XInputControllerWindows/leftStick,/SwitchProControllerHID1/leftStick]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 7d3c5170-9614-400c-88da-5ed694b25871
+    m_ActionName: 'SinglePlayer/Aim[/XInputControllerWindows/rightStick,/SwitchProControllerHID1/rightStick]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 53defc70-0b01-400f-80ff-4f8229624988
+    m_ActionName: 'SinglePlayer/Fire[/XInputControllerWindows/rightTrigger,/SwitchProControllerHID1/rightTrigger]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Gamepad
   m_DefaultActionMap: Player

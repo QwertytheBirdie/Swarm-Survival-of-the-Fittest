@@ -290,7 +290,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 16.7
+  orthographic size: 17
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -508,16 +508,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8788314b4c7bac84ca5d692dfd28ff70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  p1Kills: 0
-  p2Kills: 0
-  matchDuration: 180
-  timeRemaining: 0
-  matchEnded: 0
-  p1KillsText: {fileID: 1328133081}
-  p2KillsText: {fileID: 294683534}
-  timerText: {fileID: 1845286040}
-  resultPanel: {fileID: 1679047888}
-  resultText: {fileID: 256521662}
 --- !u!4 &178189408
 Transform:
   m_ObjectHideFlags: 0
@@ -1117,14 +1107,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7363223f73645c4c974270fe7672c00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  p1Kills: 0
-  p2Kills: 0
   matchDuration: 180
-  p1KillsText: {fileID: 1328133081}
-  p2KillsText: {fileID: 294683534}
+  player1Alive: 1
+  player2Alive: 1
+  player1Kills: 0
+  player2Kills: 0
   timerText: {fileID: 1845286040}
-  resultPanel: {fileID: 1679047888}
-  resultText: {fileID: 256521662}
+  player1KillsText: {fileID: 0}
+  player2KillsText: {fileID: 0}
+  winnerPanel: {fileID: 0}
+  winnerText: {fileID: 0}
 --- !u!4 &514840320
 Transform:
   m_ObjectHideFlags: 0
@@ -2378,8 +2370,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 515}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: -42, y: 516.383}
+  m_SizeDelta: {x: 291.285, y: 47.234}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1845286040
 MonoBehaviour:

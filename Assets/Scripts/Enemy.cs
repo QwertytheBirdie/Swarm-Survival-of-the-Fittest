@@ -1,43 +1,46 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class Enemy : MonoBehaviour
 {
+    [Header("Movement")]
     public float moveSpeed = 2f;
+
     private Transform targetPlayer;
+    private Rigidbody2D rb;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+
+        // Important: prevent physics from spinning them
+        rb.freezeRotation = true;
+    }
 
     void Update()
     {
         FindClosestPlayer();
-        MoveTowardPlayer();
     }
 
-    // ---------------------------------------------------------
-    // Move toward the closest player
-    // ---------------------------------------------------------
-    void MoveTowardPlayer()
+    void FixedUpdate()
     {
-        if (targetPlayer == null) return;
+        if (targetPlayer == null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
 
-        // Move
-        Vector2 newPos = Vector2.MoveTowards(
-            transform.position,
-            targetPlayer.position,
-            moveSpeed * Time.deltaTime
-        );
-        transform.position = newPos;
+        Vector2 dir = ((Vector2)targetPlayer.position - rb.position).normalized;
+        rb.linearVelocity = dir * moveSpeed;
 
-        // Rotate to face the player
-        Vector2 dir = targetPlayer.position - transform.position;
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+        // DO NOT rotate the enemy here if you want it to stay still.
+        // If you later want ONLY the sprite to rotate, rotate a child object instead.
     }
 
-    // ---------------------------------------------------------
-    // Find the closest player object tagged "Player"
-    // ---------------------------------------------------------
     void FindClosestPlayer()
     {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
         float closestDist = Mathf.Infinity;
         Transform closest = null;
 
@@ -45,7 +48,7 @@ public class Enemy : MonoBehaviour
         {
             if (!p.activeInHierarchy) continue;
 
-            float d = Vector2.SqrMagnitude(p.transform.position - transform.position);
+            float d = Vector2.SqrMagnitude((Vector2)p.transform.position - rb.position);
             if (d < closestDist)
             {
                 closestDist = d;
@@ -56,18 +59,15 @@ public class Enemy : MonoBehaviour
         targetPlayer = closest;
     }
 
-    // ---------------------------------------------------------
-    // Kill the player on physical collision
-    // Requires BOTH colliders to NOT be triggers
-    // ---------------------------------------------------------
-    private void OnCollisionEnter2D(Collision2D col)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (col.collider.CompareTag("Player"))
+        if (collision.collider.CompareTag("Player"))
         {
-            PlayerHealth ph = col.collider.GetComponent<PlayerHealth>();
+            PlayerHealth ph = collision.collider.GetComponent<PlayerHealth>();
             if (ph != null)
             {
-                ph.TakeDamage(9999); // Instant death
+                // Instant kill:
+                ph.TakeDamage(9999);
             }
         }
     }

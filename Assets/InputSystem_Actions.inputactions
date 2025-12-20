@@ -653,6 +653,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Ready",
+            "id": "86d6061d-b8d4-494b-b0d6-23a831bd1357",
+            "actions": [
+                {
+                    "name": "Ready to play",
+                    "type": "Button",
+                    "id": "35222519-3587-4e67-8297-0fd419e7172d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "cd47543a-f6a3-4b9b-8334-5ef3f6e28102",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Ready to play",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

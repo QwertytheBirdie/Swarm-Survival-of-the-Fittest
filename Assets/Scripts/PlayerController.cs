@@ -1,44 +1,90 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(PlayerInput))]
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement")]
-    public float moveSpeed = 10f;
-    private Vector2 moveInput;
-
-    [Header("Aiming")]
+    public float moveSpeed = 5f;
     public Transform firePoint;
-    private Vector2 aimInput;
-
-    [Header("Shooting")]
-    public PlayerShooter shooter;
 
     private Rigidbody2D rb;
+    private PlayerInput playerInput;
+    private SpriteRenderer sr;
+
+    private Vector2 moveInput;
+    private Vector2 aimInput;
+
+    public Sprite player1Sprite;
+    public Sprite player2Sprite;
+
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        playerInput = GetComponent<PlayerInput>();
+        sr = GetComponent<SpriteRenderer>();
+    }
+
+    void Start()
+    {
+        ApplyAppearance();
+        // playerIndex is valid here
+        if (playerInput.playerIndex == 0)
+            sr.color = Color.cyan;
+        else
+            sr.color = Color.red;
+    }
+
+
+    void ApplyAppearance()
+    {
+        int index = playerInput.playerIndex;
+
+        if (index == 0)
+        {
+            sr.color = Color.cyan;  // Player 1
+        }
+        else
+        {
+            sr.color = Color.red;   //Player 2
+        }
+
+        SpriteRenderer fpSR = firePoint.GetComponent<SpriteRenderer>();
+        if (fpSR != null)
+        {
+            fpSR.color = (playerInput.playerIndex == 0)
+                ? Color.cyan
+                : Color.red;
+        }
+        
+        if (playerInput.playerIndex == 0)
+        {
+            sr.sprite = player1Sprite;
+            sr.color = Color.white;
+        }
+        else
+        {
+            sr.sprite = player2Sprite;
+            sr.color = Color.white;
+        }
+
     }
 
     void FixedUpdate()
     {
-        // Movement using left stick
         rb.linearVelocity = moveInput * moveSpeed;
 
-        // Aiming using right stick
         if (aimInput.sqrMagnitude > 0.1f)
         {
             float angle = Mathf.Atan2(aimInput.y, aimInput.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
+            Quaternion rot = Quaternion.Euler(0, 0, angle);
+            transform.rotation = rot;
 
             if (firePoint != null)
-                firePoint.rotation = Quaternion.Euler(0, 0, angle);
+                firePoint.rotation = rot;
         }
     }
-
-    // ---------- INPUT SYSTEM CALLBACKS ----------
 
     public void OnMove(InputAction.CallbackContext ctx)
     {
@@ -49,10 +95,5 @@ public class PlayerController : MonoBehaviour
     {
         aimInput = ctx.ReadValue<Vector2>();
     }
-
-    public void OnFire(InputAction.CallbackContext ctx)
-    {
-        if (ctx.performed && shooter != null)
-            shooter.TryShoot();
-    }
 }
+

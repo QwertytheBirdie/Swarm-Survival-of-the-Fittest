@@ -1,74 +1,59 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
 public class Enemy : MonoBehaviour
 {
-    [Header("Movement")]
     public float moveSpeed = 2f;
+    private float basespeed;
 
-    private Transform targetPlayer;
-    private Rigidbody2D rb;
+    private Transform target;
+    private Collider2D col;
+    private PlayerHealth lastKilledPlayer;
 
-    void Awake()
+    private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-
-        // Important: prevent physics from spinning them
-        rb.freezeRotation = true;
+        col = GetComponent<Collider2D>();
+        basespeed = moveSpeed;
+        // ❌ HP DOES NOT BELONG HERE — REMOVED
     }
 
     void Update()
     {
-        FindClosestPlayer();
-    }
+        if (CoopGameManager.Instance == null) return;
 
-    void FixedUpdate()
-    {
-        if (targetPlayer == null)
+        target = CoopGameManager.Instance.GetAlivePlayerTarget();
+
+        // If target changed (new alive player), re-enable collider
+        if (target != null)
         {
-            rb.linearVelocity = Vector2.zero;
-            return;
-        }
-
-        Vector2 dir = ((Vector2)targetPlayer.position - rb.position).normalized;
-        rb.linearVelocity = dir * moveSpeed;
-
-        // DO NOT rotate the enemy here if you want it to stay still.
-        // If you later want ONLY the sprite to rotate, rotate a child object instead.
-    }
-
-    void FindClosestPlayer()
-    {
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-
-        float closestDist = Mathf.Infinity;
-        Transform closest = null;
-
-        foreach (GameObject p in players)
-        {
-            if (!p.activeInHierarchy) continue;
-
-            float d = Vector2.SqrMagnitude((Vector2)p.transform.position - rb.position);
-            if (d < closestDist)
+            PlayerHealth ph = target.GetComponent<PlayerHealth>();
+            if (ph != null && ph != lastKilledPlayer)
             {
-                closestDist = d;
-                closest = p.transform;
+                col.enabled = true;
             }
         }
 
-        targetPlayer = closest;
+        int wave = CoopGameManager.Instance.currentWave;
+
+        // Gradually increase speed (THIS IS GOOD)
+        moveSpeed = basespeed + (wave * 0.1f);
+
+        if (target == null) return;
+
+        Vector2 dir = (target.position - transform.position).normalized;
+        transform.Translate(dir * moveSpeed * Time.deltaTime);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.collider.CompareTag("Player"))
-        {
-            PlayerHealth ph = collision.collider.GetComponent<PlayerHealth>();
-            if (ph != null)
-            {
-                // Instant kill:
-                ph.TakeDamage(9999);
-            }
-        }
+        if (!other.CompareTag("Player")) return;
+
+        PlayerHealth ph = other.GetComponent<PlayerHealth>();
+        if (ph == null || !ph.IsAlive) return;
+
+        ph.KillPlayer();
+        lastKilledPlayer = ph;
+
+        // Prevent spam-kill
+        col.enabled = false;
     }
 }

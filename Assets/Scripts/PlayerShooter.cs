@@ -1,48 +1,56 @@
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(AudioSource))]
 public class PlayerShooter : MonoBehaviour
 {
-    [Header("Shooter Info")]
-    public int playerIndex = 1;      // 1 for Player1, 2 for Player2
-
     [Header("References")]
-    public GameObject bulletPrefab;  // Blue or Red bullet
+    public GameObject bulletPrefab;
     public Transform firePoint;
 
     [Header("Fire Settings")]
-    public float fireRate = 0.2f;    // seconds between shots
-
-    private float nextFireTime = 0f;
+    public float fireRate = 0.5f;
 
     [Header("Audio")]
-    public AudioClip shootSound;     // assign in inspector
-    private AudioSource audioSource;
+    public AudioClip shootSound;
+    public float shootVolume = 1f;
 
-    private void Awake()
+    private float nextFireTime;
+    private AudioSource audioSource;
+    private PlayerInput playerInput;
+
+    void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+        playerInput = GetComponent<PlayerInput>();
     }
 
+    // CALLED BY PLAYER INPUT EVENT
     public void TryShoot()
     {
-        if (Time.time < nextFireTime) return;
-        if (bulletPrefab == null || firePoint == null) return;
+        if (Time.time < nextFireTime)
+            return;
+
+        if (bulletPrefab == null || firePoint == null)
+            return;
 
         nextFireTime = Time.time + fireRate;
 
-        // Spawn bullet
-        GameObject b = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        GameObject bulletObj = Instantiate(
+            bulletPrefab,
+            firePoint.position,
+            firePoint.rotation
+        );
 
-        Bullet bullet = b.GetComponent<Bullet>();
+        // 🔥 CRITICAL LINE — THIS FIXES EVERYTHING
+        Bullet bullet = bulletObj.GetComponent<Bullet>();
         if (bullet != null)
         {
-            bullet.shooterID = playerIndex;
+            // PlayerInput index: 0 → P1, 1 → P2
+            bullet.shooterID = playerInput.playerIndex + 1;
         }
 
-        // Play shooting sound (does not break battle mode)
-        if (shootSound != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(shootSound);
-        }
+        if (shootSound != null)
+            audioSource.PlayOneShot(shootSound, shootVolume);
     }
 }

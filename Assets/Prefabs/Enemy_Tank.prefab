@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -8182806955485294570}
   - component: {fileID: 6036637344952137183}
   m_Layer: 9
-  m_Name: Enemy
+  m_Name: Enemy_Tank
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -5515851078783427038, guid: ea3622a372bebf947a4bbe8fcba05f7f, type: 3}
+  m_Sprite: {fileID: -651145263576270884, guid: 57c203f1cbb9c2c4791687b3577103ac, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -143,7 +143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2389f7ba9583464599a6dc31c7b24a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 1
+  maxHP: 2
 --- !u!60 &6036637344952137183
 PolygonCollider2D:
   m_ObjectHideFlags: 0

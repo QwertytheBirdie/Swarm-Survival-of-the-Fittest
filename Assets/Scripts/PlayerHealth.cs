@@ -1,34 +1,69 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public int maxHealth = 1;
-    private int currentHealth;
+    public bool IsAlive { get; private set; } = true;
+    public bool IsDead => !IsAlive;
 
-    void Start()
+    private PlayerInput playerInput;
+    private Collider2D col;
+    private SpriteRenderer sr;
+
+    private void Awake()
     {
-        currentHealth = maxHealth;
+        playerInput = GetComponent<PlayerInput>();
+        col = GetComponent<Collider2D>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
-    public void TakeDamage(int damage)
+    private void Start()
     {
-        currentHealth -= damage;
-
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        // Register player once
+        if (CoopGameManager.Instance != null)
+            CoopGameManager.Instance.RegisterPlayer(this);
     }
 
-    void Die()
+    // ---------------- PLAYER DEATH ----------------
+    public void KillPlayer()
     {
-        // Tell GameManager the player died
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.PlayerDied();
-        }
+        if (!IsAlive) return;
 
-        // Disable the player object so it disappears / stops moving
-        gameObject.SetActive(false);
+        IsAlive = false;
+
+        // Disable ALL player interaction
+        if (playerInput != null)
+            playerInput.enabled = false;
+
+        if (col != null)
+            col.enabled = false;
+
+        if (sr != null)
+            sr.enabled = false;
+
+        // Notify manager
+        if (CoopGameManager.Instance != null)
+            CoopGameManager.Instance.OnPlayerDied(this);
+    }
+
+    // ---------------- RESPAWN (NEXT WAVE ONLY) ----------------
+    public void Respawn()
+    {
+        IsAlive = true;
+
+        // Re-enable player fully
+        if (playerInput != null)
+            playerInput.enabled = true;
+
+        if (col != null)
+            col.enabled = true;
+
+        if (sr != null)
+            sr.enabled = true;
+
+        // Reset position if you want (optional)
+        // transform.position = CoopGameManager.Instance.GetSpawnPoint();
+
+        Debug.Log("[PLAYER] Respawned at new wave");
     }
 }
